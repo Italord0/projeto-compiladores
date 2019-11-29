@@ -16,10 +16,10 @@ public class Principal {
 	static final Scanner scan = new Scanner(System.in);
 
 	public static void main(String[] args) throws internal_error, IOException, Exception {
-		
-		String lexerPath = "C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/src/Lexer.flex";
-		String lexerCupPath = "C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/src/LexerCup.flex";
-		String sintaxCupPath = "C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/src/Sintax.cup";
+
+		String lexerPath = "./src/Lexer.flex";
+		String lexerCupPath = "./src/LexerCup.flex";
+		String sintaxCupPath = "./src/Sintax.cup";
 		String[] sintatico = { "-parser", "Sintax", sintaxCupPath };
 
 		gerar(lexerPath, lexerCupPath, sintatico);
@@ -31,16 +31,17 @@ public class Principal {
 
 		System.out.println("Digite o caminho do arquivo de entrada: ");
 		String path = scan.next();
-		
+
 		System.out.println("\n\n");
-		try {			
-			analiseLexica("C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/src/teste");
+		try {
+			analiseLexica(path);
 			System.out.println("\n\n");
-			analiseSintatica("C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/src/teste");
+			analiseSintatica(path);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			perguntarNovoArquivo();
 		}
-		
+
 	}
 
 	public static void gerar(String lexerPath, String lexerCupPath, String[] sintatico)
@@ -54,37 +55,82 @@ public class Principal {
 
 		java_cup.Main.main(sintatico);
 
-		Path rotaSym = Paths.get("C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/src/sym.java");
+		Path rotaSym = Paths.get("./src/sym.java");
 
 		if (Files.exists(rotaSym)) {
 			Files.delete(rotaSym);
 		}
 
-		Files.move(Paths.get("C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/sym.java"),
-				Paths.get("C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/src/sym.java"));
+		Files.move(Paths.get("./sym.java"), Paths.get("./src/sym.java"));
 
-		Path rotaSin = Paths.get("C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/src/Sintax.java");
+		Path rotaSin = Paths.get("./src/Sintax.java");
 
 		if (Files.exists(rotaSin)) {
 			Files.delete(rotaSin);
 		}
 
-		Files.move(Paths.get("C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/Sintax.java"),
-				Paths.get("C:/Users/AlltaxSamsung00/eclipse-workspace/CompiladorMiniPascal/src/Sintax.java"));
+		Files.move(Paths.get("./Sintax.java"), Paths.get("./src/Sintax.java"));
 	}
-	
+
 	public static void analiseSintatica(String path) throws FileNotFoundException {
 		Reader lector = new BufferedReader(new FileReader(path));
-		
+
 		Sintax s = new Sintax(new LexerCup(lector));
-		
+
 		try {
 			s.parse();
 			System.out.println("Compilação finalizada com sucesso.");
 		} catch (Exception e) {
 			Symbol sym = s.getS();
-			System.out.println("Erro de sintáxe. Linha: " + (sym.right + 1) + " Coluna: " + (sym.left + 1) + ", Texto: \"" + sym.value + "\"");
+			System.out.println("Erro de sintáxe. Linha: " + (sym.right + 1) + " Coluna: " + (sym.left + 1)
+					+ ", Texto: \"" + sym.value + "\"");
+			perguntarNovoArquivo();
 		}
+		perguntarNovoArquivo();
+
+			}
+	
+	public static void perguntarNovoArquivo() {
+		boolean esperando = true;
+
+		do { 
+			
+			try {
+
+				System.out.println("Deseja escanear outro arquivo? (s/n)");
+				Scanner scanner = new Scanner(System.in);
+				String escolha = scan.next();
+				String[] arguments = new String[] { "123" };
+
+				switch (escolha) {
+				case "S":
+					esperando = false;
+					main(arguments);
+					break;
+				case "s":
+					esperando = false;
+					main(arguments);
+					break;
+				case "N":
+					esperando = false;
+					System.out.println("Aplicação encerrada");
+					System.exit(0);
+					break;
+				case "n":
+					esperando = false;
+					System.out.println("Aplicação encerrada");
+					System.exit(0);
+					break;
+				default:
+					esperando = false;
+					break;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}while (esperando = true);
+
 	}
 
 	public static void analiseLexica(String path) throws RuntimeException, IOException {
@@ -177,7 +223,7 @@ public class Principal {
 				break;
 			}
 		}
-		
+
 		System.out.println(resultado);
 	}
 
